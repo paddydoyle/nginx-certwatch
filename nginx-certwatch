@@ -99,8 +99,8 @@ if ! command -v sendmail > /dev/null 2>&1 ; then
 	echo "Binary 'sendmail' not found but required."
 	exit 1
 fi
-if ! command -v find > /dev/null 2>&1 ; then
-	echo "Binary 'find' not found but required."
+if ! command -v nginx > /dev/null 2>&1 ; then
+	echo "Binary 'nginx' not found but required."
 	exit 1
 fi
 
@@ -120,17 +120,19 @@ if ! command -v uniq > /dev/null 2>&1 ; then
 fi
 
 #
-# Paths
+# Conf file
 #
-if [ ! -d "${NGINX_CONF_PATH}" ]; then
-	echo "Nginx config path not found in: ${NGINX_CONF_PATH}"
+NGINX_CONF="${NGINX_CONF_PATH}/nginx.conf"
+if [ ! -f "${NGINX_CONF}" ]; then
+	echo "Nginx config file not found at: ${NGINX_CONF}"
 	exit 1
 fi
 
 #
-# Check if there is at least one certificate available
+# Check if there is at least one certificate available.
+# Use 'nginx -T' to only test certs loaded by nginx.
 #
-SSL_DIRECTIVES="$( $(which find) "${NGINX_CONF_PATH}" -name "*.conf" -exec grep -E '^[[:space:]]*ssl_certificate[[:space:]]+' "{}" \; )"
+SSL_DIRECTIVES="$( $(which nginx) -T -c ${NGINX_CONF} 2>/dev/null | grep -E '^[[:space:]]*ssl_certificate[[:space:]]+')"
 CERTIFICATES="$( echo "${SSL_DIRECTIVES}" | awk '{print $2}' | awk -F ';' '{print $1}' | sort | uniq )"
 
 if [ "${SSL_DIRECTIVES}" = "" ]; then
