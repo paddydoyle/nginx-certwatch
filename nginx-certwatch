@@ -130,7 +130,7 @@ fi
 #
 # Check if there is at least one certificate available
 #
-SSL_DIRECTIVES="$( $(which find) "${NGINX_CONF_PATH}" -name "*.conf" -exec grep -E '[[:space:]]*ssl_certificate[[:space:]]+' "{}" \; )"
+SSL_DIRECTIVES="$( $(which find) "${NGINX_CONF_PATH}" -name "*.conf" -exec grep -E '^[[:space:]]*ssl_certificate[[:space:]]+' "{}" \; )"
 CERTIFICATES="$( echo "${SSL_DIRECTIVES}" | awk '{print $2}' | awk -F ';' '{print $1}' | sort | uniq )"
 
 if [ "${SSL_DIRECTIVES}" = "" ]; then
