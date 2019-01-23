@@ -166,6 +166,14 @@ watch_nginx_certs()
 	sendmail_bin="$( which sendmail )"
 
 	for c in ${CERTIFICATES}; do
+		# Does the filename start with a '/'?
+		first_char=$(echo "${c}" | cut -c1)
+		# If not, prepend the nginx path
+		if [ "${first_char}" != "/" ]
+		then
+			c="${NGINX_CONF_PATH}/${c}"
+		fi
+
 		if [ -f "${c}" ]; then
 			# Check whether a warning message is needed, then issue one if so.
 			${certwatch_bin} ${opts} -q "${c}" &&
